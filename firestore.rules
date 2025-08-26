@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow access to passwords collection for our single-user app
+    // Since we use PIN/biometric auth instead of Firebase Auth
+    match /passwords/{document} {
+      // Allow read access to all documents in passwords collection
+      allow read: if true;
+      // Allow write access if the document is for our user
+      allow write: if request.resource.data.userId == 'girlfriend_user';
+      // Allow delete access for our user's documents
+      allow delete: if resource.data.userId == 'girlfriend_user';
+    }
+    
+    // Deny access to all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
